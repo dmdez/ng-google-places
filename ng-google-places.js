@@ -1,5 +1,8 @@
 (function() {
 
+  // https://gist.github.com/VictorBjelkholm/6687484
+  // modified to have better structure for details
+
   function GooglePlacesDirective() {
     return {
       restrict: 'AC',
