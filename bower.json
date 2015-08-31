@@ -1,0 +1,18 @@
+{
+  "name": "ng-google-places",
+  "main": "ng-google-places.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/dmdez/ng-google-places",
+  "authors": [
+    "Deric Mendez <deric@cremalab.com>"
+  ],
+  "description": "Angular module that adds google places autocomplete to any input field",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

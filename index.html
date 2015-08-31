@@ -1,0 +1,38 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+
+      <form ng-init="location = {}">
+        <input type="text" ng-model="location.address" class="googlePlaces"
+          google-places-address="location.address"
+          google-places-country="location.country"
+          google-places-state="location.state"
+          google-places-city="location.city"
+          google-places-foo="location.foo"
+         />
+         {{location}}
+      </form>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular.min.js"></script>
+      <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+      <script src="ng-google-places.js"></script>
+      <script>
+
+        angular.module('app', [
+          'ng-google-places'
+        ]);
+
+        document.addEventListener("DOMContentLoaded", function() {
+          angular.bootstrap(document.body, ['app']);
+        });
+
+      </script>
+    </body>
+</html>
