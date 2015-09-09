@@ -28,11 +28,15 @@
   function GooglePlacesLink(scope, element, attrs, ctrl) {
     var options = {
         types: [], //attrs.googlePlace !== "" ? attrs.googlePlace.split(',') : [],
-        componentRestrictions: {},
-        components: {
+        componentRestrictions: {
           country: 'us'
-        }
+        },
+        components: {}
     };
+    if ( attrs.googlePlacesOptions ) {
+      angular.extend(options, scope.$eval(attrs.googlePlacesOptions));
+    }
+    console.log(options);
     ctrl.gPlace = new google.maps.places.Autocomplete(element[0], options);
     google.maps.event.addListener(ctrl.gPlace, 'place_changed', ctrl.parsePlaces);
   }
