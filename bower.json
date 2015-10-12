@@ -1,7 +1,7 @@
 {
   "name": "ng-google-places",
   "main": "ng-google-places.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/dmdez/ng-google-places",
   "authors": [
     "Deric Mendez <deric@cremalab.com>"

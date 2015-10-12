@@ -1,0 +1,24 @@
+{
+  "name": "ng-google-places",
+  "version": "0.1.2",
+  "description": "Angular module for Google Places",
+  "main": "ng-google-places.js",
+  "dependencies": {
+    "uglifyjs": "^2.4.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "./node_modules/.bin/uglifyjs -b -o ng-google-places.js src/module.js src/directive.js src/controller.js src/service.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmdez/ng-google-places.git"
+  },
+  "author": "Deric Mendez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dmdez/ng-google-places/issues"
+  },
+  "homepage": "https://github.com/dmdez/ng-google-places"
+}

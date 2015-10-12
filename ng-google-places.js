@@ -1,115 +1,131 @@
 (function() {
+    angular.module("ng-google-places", []);
+})();
 
-  // https://gist.github.com/VictorBjelkholm/6687484
-  // modified to have better structure for details
-
-  function GooglePlacesDirective() {
-    return {
-      restrict: 'AC',
-      bindToController: true,
-      controller: ['$scope', GooglePlacesController],
-      controllerAs: 'googlePlaces',
-      link: GooglePlacesLink,
-      scope: {
-        googlePlacesAddress    : '=',
-        googlePlacesState      : '=',
-        googlePlacesPostalcode : '=',
-        googlePlacesCity       : '=',
-        googlePlacesCountry    : '=',
-        googlePlacesFormatted  : '=',
-        googlePlacesLat        : '=',
-        googlePlacesLng        : '=',
-        googlePlacesPlaceId    : '=',
-        googlePlacesStreet     : '='
-      }
-    };
-  }
-
-  function GooglePlacesLink(scope, element, attrs, ctrl) {
-    var options = {
-        types: [], //attrs.googlePlace !== "" ? attrs.googlePlace.split(',') : [],
-        componentRestrictions: {
-          country: 'us'
-        },
-        components: {}
-    };
-    if ( attrs.googlePlacesOptions ) {
-      angular.extend(options, scope.$eval(attrs.googlePlacesOptions));
+(function() {
+    function GooglePlacesDirective(GooglePlacesService, $window) {
+        return {
+            restrict: "AC",
+            bindToController: true,
+            controller: "GooglePlacesController as googlePlaces",
+            link: function(scope, element, attrs, ctrl) {
+                var options = {
+                    types: [],
+                    componentRestrictions: {
+                        country: "us"
+                    },
+                    components: {}
+                };
+                var loadPlaces = function() {
+                    ctrl.gPlace = new google.maps.places.Autocomplete(element[0], options);
+                    google.maps.event.addListener(ctrl.gPlace, "place_changed", ctrl.parsePlaces);
+                };
+                if (attrs.googlePlacesOptions) {
+                    angular.extend(options, scope.$eval(attrs.googlePlacesOptions));
+                }
+                if ($window.google && $window.google.maps) {
+                    loadPlaces();
+                } else {
+                    GooglePlacesService.loadApi().then(function() {
+                        loadPlaces();
+                    });
+                }
+            },
+            scope: {
+                googlePlacesAddress: "=",
+                googlePlacesState: "=",
+                googlePlacesPostalcode: "=",
+                googlePlacesCity: "=",
+                googlePlacesCountry: "=",
+                googlePlacesFormatted: "=",
+                googlePlacesLat: "=",
+                googlePlacesLng: "=",
+                googlePlacesPlaceId: "=",
+                googlePlacesStreet: "="
+            }
+        };
     }
-    ctrl.gPlace = new google.maps.places.Autocomplete(element[0], options);
-    google.maps.event.addListener(ctrl.gPlace, 'place_changed', ctrl.parsePlaces);
-  }
+    angular.module("ng-google-places").directive("googlePlaces", [ "GooglePlacesService", "$window", GooglePlacesDirective ]);
+})();
 
-  function GooglePlacesController($scope) {
-    var componentForm = {
-        street_number: 'short_name',
-        route: 'long_name',
-        locality: 'long_name',
-        administrative_area_level_1: 'short_name',
-        country: 'long_name',
-        postal_code: 'short_name'
-    };
-
-    var mapping = {
-        street_number: 'number',
-        route: 'street',
-        locality: 'city',
-        administrative_area_level_1: 'state',
-        country: 'country',
-        postal_code: 'zip_code'
-    };
-
-    this.parsePlaces = function() {
-      var place = this.gPlace.getPlace();
-      var details = place.geometry && place.geometry.location ? {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      } : {};
-
-      // Get each component of the address from the place details
-      // and fill the corresponding field on the form.
-      for (var i = 0; i < place.address_components.length; i++) {
-        var addressType = place.address_components[i].types[0];
-        if (componentForm[addressType]) {
-          var val = place.address_components[i][componentForm[addressType]];
-          details[mapping[addressType]] = val;
+(function() {
+    function GooglePlacesController($scope) {
+        var componentForm = {
+            street_number: "short_name",
+            route: "long_name",
+            locality: "long_name",
+            administrative_area_level_1: "short_name",
+            country: "long_name",
+            postal_code: "short_name"
+        };
+        var mapping = {
+            street_number: "number",
+            route: "street",
+            locality: "city",
+            administrative_area_level_1: "state",
+            country: "country",
+            postal_code: "zip_code"
+        };
+        this.parsePlaces = function() {
+            var place = this.gPlace.getPlace();
+            var details = place.geometry && place.geometry.location ? {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            } : {};
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType]) {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    details[mapping[addressType]] = val;
+                }
+            }
+            details.formatted = place.formatted_address;
+            details.placeId = place.place_id;
+            details.address = getStreetInfo(details);
+            this.googlePlacesAddress = details.address;
+            this.googlePlacesState = details.state;
+            this.googlePlacesPostalcode = details.zip_code;
+            this.googlePlacesCity = details.city;
+            this.googlePlacesCountry = details.country;
+            this.googlePlacesFormatted = details.formatted;
+            this.googlePlacesLat = details.lat;
+            this.googlePlacesLng = details.lng;
+            this.googlePlacesPlaceId = details.placeId;
+            this.googlePlacesStreet = details.street;
+            $scope.$apply();
+        }.bind(this);
+        function getStreetInfo(details) {
+            var addressParts = [];
+            if (details.number) addressParts.push(details.number);
+            if (details.street) addressParts.push(details.street);
+            return addressParts.join(" ");
         }
-      }
-
-      details.formatted = place.formatted_address;
-      details.placeId = place.place_id;
-      details.address = getStreetInfo(details);
-
-      this.googlePlacesAddress    = details.address;
-      this.googlePlacesState      = details.state;
-      this.googlePlacesPostalcode = details.zip_code;
-      this.googlePlacesCity       = details.city;
-      this.googlePlacesCountry    = details.country;
-      this.googlePlacesFormatted  = details.formatted;
-      this.googlePlacesLat        = details.lat;
-      this.googlePlacesLng        = details.lng;
-      this.googlePlacesPlaceId    = details.placeId;
-      this.googlePlacesStreet     = details.street;
-
-      $scope.$apply();
-
-    }.bind(this);
-
-    function getStreetInfo(details) {
-      var addressParts = [];
-
-      if ( details.number )
-        addressParts.push(details.number);
-
-      if (details.street)
-        addressParts.push(details.street);
-
-      return addressParts.join(' ');
     }
-  }
+    angular.module("ng-google-places").controller("GooglePlacesController", [ "$scope", GooglePlacesController ]);
+})();
 
-  angular
-    .module("ng-google-places", [])
-    .directive('googlePlaces', GooglePlacesDirective);
-
+(function() {
+    function GooglePlacesService($q, $window) {
+        function LoadScript() {
+            var s = document.createElement("script");
+            s.src = "https://maps.googleapis.com/maps/api/js?libraries=places&callback=initPlaces";
+            document.body.appendChild(s);
+        }
+        function LoadApi() {
+            var deferred = $q.defer();
+            $window.initPlaces = function() {
+                deferred.resolve();
+            };
+            if ($window.attachEvent) {
+                $window.attachEvent("onload", LoadScript);
+            } else {
+                $window.addEventListener("load", LoadScript, false);
+            }
+            return deferred.promise;
+        }
+        return {
+            loadApi: LoadApi
+        };
+    }
+    angular.module("ng-google-places").factory("GooglePlacesService", [ "$q", "$window", GooglePlacesService ]);
 })();
