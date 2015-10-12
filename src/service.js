@@ -1,5 +1,9 @@
 
 (function() {
+  var loaded = false;
+  window.addEventListener("load", function () {
+    loaded = true;
+  });
 
   function GooglePlacesService($q, $window) {
     function LoadScript() {
@@ -14,7 +18,9 @@
         deferred.resolve();
       };
       // thanks to Emil Stenström: http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
-      if ($window.attachEvent) {
+      if (loaded) {
+        LoadScript();
+      } else if ($window.attachEvent) {
         $window.attachEvent('onload', LoadScript);
       } else {
         $window.addEventListener('load', LoadScript, false);

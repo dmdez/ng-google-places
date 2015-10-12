@@ -105,6 +105,10 @@
 })();
 
 (function() {
+    var loaded = false;
+    window.addEventListener("load", function() {
+        loaded = true;
+    });
     function GooglePlacesService($q, $window) {
         function LoadScript() {
             var s = document.createElement("script");
@@ -116,7 +120,9 @@
             $window.initPlaces = function() {
                 deferred.resolve();
             };
-            if ($window.attachEvent) {
+            if (loaded) {
+                LoadScript();
+            } else if ($window.attachEvent) {
                 $window.attachEvent("onload", LoadScript);
             } else {
                 $window.addEventListener("load", LoadScript, false);
