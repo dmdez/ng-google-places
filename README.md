@@ -1,18 +1,39 @@
 # ng-google-places
 Angular module for Google Places
 
+## Install
+```
+bower install ng-google-places
+```
+
+```
+angular.module('app', [
+  'ng-google-places'
+])
+
+## Config (optional)
+```
+app.config(function(GooglePlacesProvider) {
+  GooglePlacesProvider.setApiKey("AIzaSyCV4PF-QTAOeM3NFKYEI2GqwVBnt4ugqbY");
+});
+```
+
 ## Usage
 Make sure Google Places API library is loaded
 
 ### Straight Up
 
+Given the following input field, only the address string will update the model.
+This option is great for a simple need of capturing a formatted address.
+
 ```
-<input type="text" class="googlePlaces">
+<input type="text" ng-model="address" class="googlePlaces">
 ```
 
 ### Affecting other variables
 
-If you want to populate other scoped variables with parts of the selected Google Places address:
+If you want to populate other scoped variables with parts of the selected
+Google Places address:
 
 ```
 <form ng-init="location={}">
@@ -29,4 +50,5 @@ If you want to populate other scoped variables with parts of the selected Google
     google-places-street="location.street">
 </form>
 ```
-This will help fill out other parts of a form based off of the Google Places results.
+
+This will help fill out other parts of a form based off of the address results.

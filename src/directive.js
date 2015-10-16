@@ -4,7 +4,7 @@
   // https://gist.github.com/VictorBjelkholm/6687484
   // modified to have better structure for details
 
-  function GooglePlacesDirective(GooglePlacesService, $window) {
+  function GooglePlacesDirective(GooglePlacesLoadApi, $window) {
     return {
       restrict: 'AC',
       bindToController: true,
@@ -28,7 +28,7 @@
         if ( $window.google && $window.google.maps ) {
           loadPlaces();
         } else {
-          GooglePlacesService.loadApi().then(function() {
+          GooglePlacesLoadApi.loadApi().then(function() {
             loadPlaces();
           });
         }
@@ -52,6 +52,6 @@
 
   angular
     .module("ng-google-places")
-    .directive('googlePlaces', ["GooglePlacesService", "$window", GooglePlacesDirective]);
+    .directive('googlePlaces', ["GooglePlacesLoadApi", "$window", GooglePlacesDirective]);
 
 })();

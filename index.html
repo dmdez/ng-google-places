@@ -22,14 +22,17 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular.min.js"></script>
       <script src="ng-google-places.js"></script>
       <script>
+        (function() {
+          angular.module('app', [
+            'ng-google-places'
+          ]).config(function(GooglePlacesProvider) {
+            GooglePlacesProvider.setApiKey("AIzaSyCV4PF-QTAOeM3NFKYEI2GqwVBnt4ugqbY");
+          });
 
-        angular.module('app', [
-          'ng-google-places'
-        ]);
-
-        document.addEventListener("DOMContentLoaded", function() {
-          angular.bootstrap(document.body, ['app']);
-        });
+          document.addEventListener("DOMContentLoaded", function() {
+            angular.bootstrap(document.body, ['app']);
+          });
+        })();
 
       </script>
     </body>

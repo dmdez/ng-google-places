@@ -5,10 +5,13 @@
     loaded = true;
   });
 
-  function GooglePlacesService($q, $window) {
+  function GooglePlacesLoadApi($q, $window, GooglePlaces) {
+
     function LoadScript() {
       var s = document.createElement('script'); // use global document since Angular's $document is weak
       s.src = 'https://maps.googleapis.com/maps/api/js?libraries=places&callback=initPlaces';
+      if (GooglePlaces.apiKey)
+        s.src += '&key=' + GooglePlaces.apiKey;
       document.body.appendChild(s);
     }
 
@@ -35,6 +38,19 @@
 
   angular
     .module("ng-google-places")
-    .factory("GooglePlacesService", ["$q", "$window", GooglePlacesService]);
+    .factory("GooglePlacesLoadApi", ["$q", "$window", "GooglePlaces", GooglePlacesLoadApi])
+    .provider('GooglePlaces', [function() {
+      var apiKey;
+      return {
+        setApiKey: function(key) {
+          apiKey = key;
+        },
+        $get: function () {
+          return {
+            apiKey: apiKey
+          }
+        }
+      }
+    }]);
 
 })();

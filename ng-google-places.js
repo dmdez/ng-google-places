@@ -3,7 +3,7 @@
 })();
 
 (function() {
-    function GooglePlacesDirective(GooglePlacesService, $window) {
+    function GooglePlacesDirective(GooglePlacesLoadApi, $window) {
         return {
             restrict: "AC",
             bindToController: true,
@@ -26,7 +26,7 @@
                 if ($window.google && $window.google.maps) {
                     loadPlaces();
                 } else {
-                    GooglePlacesService.loadApi().then(function() {
+                    GooglePlacesLoadApi.loadApi().then(function() {
                         loadPlaces();
                     });
                 }
@@ -45,7 +45,7 @@
             }
         };
     }
-    angular.module("ng-google-places").directive("googlePlaces", [ "GooglePlacesService", "$window", GooglePlacesDirective ]);
+    angular.module("ng-google-places").directive("googlePlaces", [ "GooglePlacesLoadApi", "$window", GooglePlacesDirective ]);
 })();
 
 (function() {
@@ -109,10 +109,11 @@
     window.addEventListener("load", function() {
         loaded = true;
     });
-    function GooglePlacesService($q, $window) {
+    function GooglePlacesLoadApi($q, $window, GooglePlaces) {
         function LoadScript() {
             var s = document.createElement("script");
             s.src = "https://maps.googleapis.com/maps/api/js?libraries=places&callback=initPlaces";
+            if (GooglePlaces.apiKey) s.src += "&key=" + GooglePlaces.apiKey;
             document.body.appendChild(s);
         }
         function LoadApi() {
@@ -133,5 +134,17 @@
             loadApi: LoadApi
         };
     }
-    angular.module("ng-google-places").factory("GooglePlacesService", [ "$q", "$window", GooglePlacesService ]);
+    angular.module("ng-google-places").factory("GooglePlacesLoadApi", [ "$q", "$window", "GooglePlaces", GooglePlacesLoadApi ]).provider("GooglePlaces", [ function() {
+        var apiKey;
+        return {
+            setApiKey: function(key) {
+                apiKey = key;
+            },
+            $get: function() {
+                return {
+                    apiKey: apiKey
+                };
+            }
+        };
+    } ]);
 })();
