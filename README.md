@@ -10,6 +10,7 @@ bower install ng-google-places
 angular.module('app', [
   'ng-google-places'
 ])
+```
 
 ## Config (optional)
 ```
